@@ -24,6 +24,13 @@ Use this prompt in any Claude conversation to generate a Splitwise-style Excel e
 > - TOTAL OWED row = plain `SUM()` over the Helper sheet columns
 > - Freeze the header row
 > - Alternate row shading, colored header and TOTAL OWED row
+> - Add a buffer of at least 2× the estimated row count so the user rarely runs out of space
+>
+> **After generating the file, tell the user:**
+> - ✅ To add an expense: type into the next empty row — formulas already cover it
+> - ✅ To edit an expense: click the cell and type the new value
+> - ❌ To remove an expense: do NOT delete the row — select all cells in that row and press Delete to clear contents
+> - ❌ Never insert or delete rows — this shifts Helper sheet references and breaks TOTAL OWED
 
 ---
 
@@ -41,21 +48,21 @@ Use this prompt in any Claude conversation to generate a Splitwise-style Excel e
 
 ---
 
-## Adding a New Expense Row
+## Adding, Editing, and Deleting Expense Rows
 
-> ⚠️ The hidden Helper sheet has pre-built formulas only up to the estimated row count. Follow these steps to stay within that range, or to extend it if needed.
+> ⚠️ **Never insert or delete rows.** The TOTAL OWED formulas reference a fixed range tied to the Helper sheet. Inserting or deleting rows shifts those references and breaks the totals. Always use the approaches below instead.
 
-### If you have rows remaining in the buffer
-Just type into the next empty row — formulas in the Helper sheet already cover it.
+### Adding a new expense
+Just type into the next empty row within the pre-built range — the Helper sheet already covers it. No other steps needed.
 
-### If you've run out of rows
-1. Go to the **Helper** sheet (right-click any sheet tab → **Unhide** → select Helper)
-2. Select the last row of helper formulas and drag them down to cover the new row
-3. Go back to the **Expenses** sheet and update the `SUM()` range in the **TOTAL OWED** row for each person column (e.g. change `SUM(Helper!C2:C50)` to `SUM(Helper!C2:C51)`)
-4. Re-hide the Helper sheet when done (right-click tab → **Hide**)
+### Editing an expense
+Click directly into the cell you want to change (expense name, amount, or share values) and type the new value. TOTAL OWED updates automatically.
 
-### Tip
-When generating the file, ask Claude to use a generous buffer (e.g. 100 rows) so you rarely need to extend it.
+### Removing an expense
+**Do not delete the row.** Instead, select all cells in that row (columns A through the last person column) and press **Delete** to clear the contents. The row becomes blank and contributes $0 to all totals — exactly as if it never existed.
+
+### If you've used up all rows in the buffer
+Ask Claude to regenerate the file with a larger row count. When generating, ask for a buffer of at least 2× your expected expense count so this rarely comes up.
 
 ---
 
